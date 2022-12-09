@@ -1,0 +1,14 @@
+FROM --platform=linux/amd64 node:19.2.0-bullseye 
+
+ENV OPENAI_API_KEY=changeMe
+ENV DISCORD_TOKEN=changeMe
+
+COPY gpt_bot.js /GPT/gpt_bot.js
+COPY package.json /GPT/package.json
+COPY package-lock.json /GPT/package-lock.json
+
+WORKDIR /GPT
+
+RUN npm install --save ../GPT
+
+CMD ["node", "gpt_bot.js"]

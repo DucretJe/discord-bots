@@ -1,0 +1,33 @@
+---
+name: "GPT builder"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'GPT/**'
+      - '.github/workflows/build_gpt.yaml'
+  pull_request:
+    paths:
+      - 'GPT/**'
+      - '.github/workflows/build_gpt.yaml'
+  workflow_dispatch: # Allow to manually trigger the pipeline
+
+jobs:
+  build:
+  runs-on: ubuntu-22.04
+  steps:
+
+  - name: 🛎️ Checkout
+    uses: actions/checkout@v3
+
+  - name: Build and Push GPT
+    uses: docker/build-push-action@v2
+    with:
+      context: GPT
+      file: GPT/Dockerfile
+      push: {{ github.branches == 'main' && true || false }}
+      tags: |
+        ghcr.io/${{ github.repository_owner }}/gpt:latest
+        ghcr.io/${{ github.repository_owner }}/gpt:${{ github.sha }}

@@ -1,9 +1,9 @@
-# Repository template
+# Discord bots
 
-## Features
+## Bots
 
-The repository is spawned with
+* [GPT](#gpt)
 
-* Renovate config file
-* Super Linter that runs on every push
-* Checkov that runs on PR or push on Main when in /terraform or workflow file
+### GPT
+
+This bot allow to interact with [OpenAI ChatGPT](https://openai.com/blog/chatgpt/) in Discord.
