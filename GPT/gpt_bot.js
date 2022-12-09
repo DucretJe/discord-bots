@@ -6,7 +6,6 @@ const openai = require('openai.js');
 
 // how to give the bot a key from env variable
 const apiKey = process.env.OPENAI_API_KEY;
-console.log('API key: ' + apiKey);
 openai.apiKey = apiKey;
 
 // Create a new Discord client
@@ -14,7 +13,6 @@ const client = new Discord.Client({intents: 2048});
 
 // Set the token for the bot
 const token = process.env.DISCORD_TOKEN;
-console.log('Token: ' + token);
 
 // When the bot is ready, log a message to the console
 client.on('ready', () => {
