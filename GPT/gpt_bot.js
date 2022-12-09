@@ -1,45 +1,54 @@
-const Discord = require('discord.js');
-const openai = require('openai.js');
+const { Client, GatewayIntentBits } = require('discord.js');
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ]
+});
+const { Configuration, OpenAIApi } = require("openai");
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
 
-// Set your OpenAI API key
-// You can get one here: https://beta.openai.com/account/api-keys
-
-// how to give the bot a key from env variable
-const apiKey = process.env.OPENAI_API_KEY;
-openai.apiKey = apiKey;
-
-// Create a new Discord client
-const client = new Discord.Client({intents: 2048});
-
-// Set the token for the bot
-const token = process.env.DISCORD_TOKEN;
-
-// When the bot is ready, log a message to the console
 client.on('ready', () => {
-  console.log('Bot is ready!');
+  console.log(`Logged in as ${client.user.tag}!`);
 });
 
-// When a message is sent in the Discord server, check if it starts with the /ai command
-client.on('message', message => {
-  if (message.content.startsWith('/ai')) {
+client.on('messageCreate', msg => {
+  console.log(msg.content);
+  if (msg.content.startsWith('!ai')) {
+    // Remove the command from the message
+    message = msg.content.replace('!ai', '');
+    console.log(message);
     // Use the OpenAI API to generate a response to the message
-    openai.completions.create(
+    completion = openai.createCompletion(
       {
-        prompt: message.content,
-        model: 'text-davinci-002',
-        max_tokens: 2048,
-        temperature: 0.5
-      },
-      (error, response) => {
-        if (error) {
-          console.error(error);
-        } else {
-          message.channel.send(response.choices[0].text);
-        }
+        prompt: message,
+        model: 'text-davinci-003',
+        max_tokens: 2048
+      });
+    console.log('completion is thinking...');
+    msg.reply('🧠 Thinking...');
+    completion.then((response) => {
+      console.log(response.data.choices[0].text);
+      // Split the response into multiple messages of 3000 characters or less
+      // This is to avoid the 4000 character limit on Discord messages
+      var response = response.data.choices[0].text;
+      var responseArray = [];
+      while (response.length > 3000) {
+        var split = response.lastIndexOf('.', 3000);
+        responseArray.push(response.substring(0, split + 1));
+        response = response.substring(split + 1);
       }
-    );
+      responseArray.push(response);
+      // Send the response to the channel
+      for (var i = 0; i < responseArray.length; i++) {
+        msg.reply(responseArray[i]);
+      }
+    });
   }
 });
 
-// Log the bot in using the token
-client.login(token);
+client.login('MTA1MDgzNDY5MTQyMDMyNzk3Ng.GwiK62.HNo9-hPzsU6TA1DeNtHA0euUuQVlVe1bj7OMIM');
